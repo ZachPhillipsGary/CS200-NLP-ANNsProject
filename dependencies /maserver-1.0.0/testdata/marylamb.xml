@@ -1,0 +1,29 @@
+<TEI xmlns="http://www.tei-c.org/ns/1.0"> 
+<teiHeader>
+  <fileDesc>
+    <titleStmt>
+        <title>Mary's Little Lamb.</title>
+        <author>Sarah Josepha Hale.</author>
+    </titleStmt>
+    <publicationStmt>
+      <p>Originally published in Boston in 1830.</p>
+    </publicationStmt>
+    <sourceDesc>
+      <p></p>
+    </sourceDesc>
+  </fileDesc>
+</teiHeader>
+<text xml:lang="eng"> 
+  <body>
+    <lg type="verse">
+      <head>MARY'S LITTLE LAMB.</head>
+      <lg type="stanza">
+        <l>Mary had a little lamb,</l>
+        <l>Its fleece was white as snow.</l>
+        <l>And every where that Mary went</l>
+        <l>The lamb was sure to go.</l>
+      </lg>
+    </lg>
+  </body>
+</text>
+</TEI>

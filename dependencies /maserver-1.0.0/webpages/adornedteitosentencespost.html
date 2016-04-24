@@ -1,0 +1,71 @@
+<html>
+
+<head>
+<meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
+<title>Test extract sentences from TEI service</title>
+<link rel="stylesheet"
+      href="maserver.css"
+      type="text/css" media="screen" />
+<style type="text/css" media="all">
+   <!--
+   @import "maserver.css";
+   //-->
+</style>
+</head>
+
+<body>
+
+<h1>Test extract sentences from TEI service using POST</h1>
+
+<form accept-charset="UTF-8" method="post" action="teiadornedtosentences"
+      target="_blank"
+      enctype="multipart/form-data" name="teiadornedtosentences">
+
+<table cellpadding="0" cellspacing="5">
+
+<tr>
+<td>
+<strong>Adorned TEI XML file:</strong>
+</td>
+<td>
+<input type="file" name="teifile" size="50">
+</td>
+</tr>
+<tr>
+<td>&nbsp;</td>
+<td>
+<input type="checkbox" name="mainTextOnly" value="true"
+       checked="checked"/>
+Only return sentences in main text
+</td>
+</tr>
+<tr>
+<td>&nbsp;</td>
+<td>
+<input type="checkbox" name="resultsAsAttachedFile" value="true"
+       checked="checked"/>
+Send results as attached file
+</td>
+</tr>
+<tr>
+<td>
+&nbsp;
+</td>
+<td>
+&nbsp;
+</td>
+</tr>
+
+<tr>
+<td colspan="2">
+<input type="submit" name="extract" value="Extract Sentences" />
+</td>
+</tr>
+
+</table>
+</form>
+
+</body>
+
+</html>
+

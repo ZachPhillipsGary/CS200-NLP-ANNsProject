@@ -1,0 +1,169 @@
+<html>
+
+<head>
+<meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
+<title>Test Sentence Splitter service</title>
+<link rel="stylesheet"
+      href="maserver.css"
+      type="text/css" media="screen" />
+<style type="text/css" media="all">
+   <!--
+   @import "maserver.css";
+   //-->
+</style>
+</head>
+
+<body>
+
+<h1>Test Text Segmenter service using POST</h1>
+
+<p>
+Enter text to segment in the text field below.<br />
+</p>
+
+<form accept-charset="UTF-8" method="post" action="textsegmenter"
+      target="_blank"
+      name="segmenter">
+<table cellpadding="0" cellspacing="5">
+
+<tr>
+<td><strong>Text:</strong></td>
+<td colspan="2">
+<textarea name="text" rows="15" cols="76"></textarea>
+</td>
+</tr>
+
+<tr>
+<td>&nbsp;</td>
+<td>
+<input type="checkbox" name="includeInputText" value="true"
+       checked="checked"/>
+Include input text in results
+</td>
+</tr>
+<tr>
+<td>
+&nbsp;
+</td>
+<td>
+&nbsp;
+</td>
+</tr>
+<tr>
+<td valign="top">
+<strong>
+Lexicon:</strong>
+</td>
+<td>
+<input type="radio" name="corpusConfig" value="eme">Early Modern English</input><br />
+<input type="radio" name="corpusConfig" value="ece">Eighteen Century English</input><br />
+<input type="radio" name="corpusConfig" value="ncf" checked="checked">Nineteenth Century Fiction</input>
+</td>
+</tr>
+<tr>
+<td>
+&nbsp;
+</td>
+<td>
+&nbsp;
+</td>
+</tr>
+<tr>
+<td valign="top">
+<strong>
+Segmenter:</strong>
+</td>
+<td>
+<input type="radio" name="segmenterName" value="C99">C99</input><br />
+<table border="0">
+<tr>
+<td>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</td>
+<td>
+Mask size:
+</td>
+<td>
+<input type="text" name="c99MaskSize" size="5" value="11" /></input>
+</td>
+</tr>
+<tr>
+<td>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</td>
+<td>
+Segments desired:
+</td>
+<td>
+<input type="text" name="c99SegmentsWanted" size="5" value="-1" /></input>
+</td>
+</tr>
+</table>
+<input type="radio" name="segmenterName" value="Text Tiling"
+checked="checked">Text Tiling</input><br />
+<table border="0">
+<tr>
+<td>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</td>
+<td>
+Sliding window size:
+</td>
+<td>
+<input type="text" name="tilerSlidingWindowSize" size="5" value="10" /></input>
+</td>
+</tr>
+<tr>
+<td>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</td>
+<td>
+Segment size:
+</td>
+<td>
+<input type="text" name="tilerStepSize" size="5" value="100" /></input>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+<tr>
+<td>
+&nbsp;
+</td>
+<td>
+&nbsp;
+</td>
+</tr>
+<tr>
+<td valign="top">
+<strong>Results format:</strong>
+</td>
+<td>
+<input type="radio" name="media" value="json">JSON format</input><br />
+<input type="radio" name="media" value="xml" checked="checked">XML format</input><br />
+<input type="radio" name="media" value="html">HTML format</input><br />
+<input type="radio" name="media" value="text">Text format</input>
+</td>
+</tr>
+<tr>
+<td>
+&nbsp;
+</td>
+<td>
+&nbsp;
+</td>
+</tr>
+
+<tr>
+<td colspan="2">
+<input type="submit" name="segment" value="Segment" />
+</td>
+</tr>
+</table>
+</form>
+
+</body>
+
+</html>
+

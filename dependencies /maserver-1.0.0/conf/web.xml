@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE web-app PUBLIC
+   "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+   "http://java.sun.com/dtd/web-app_2_3.dtd">
+
+<web-app>
+
+    <!-- Web application -->
+
+    <display-name>MorphAdorner Server</display-name>
+
+    <context-param>
+            <param-name>org.restlet.application</param-name>
+            <param-value>
+               edu.northwestern.at.morphadorner.server.MorphAdornerServerApplication
+            </param-value>
+    </context-param>
+
+    <!-- Data initializer -->
+
+    <servlet>
+            <servlet-name>DataInitializerServlet</servlet-name>
+            <servlet-class>
+               edu.northwestern.at.morphadorner.server.servlets.DataInitializationServlet
+            </servlet-class>
+
+            <!-- Set the MorphAdorner Server data directory here. -->
+
+            <init-param>
+               <param-name>datadirectory</param-name>
+               <param-value>/project/maserverdata/</param-value>
+            </init-param>
+
+            <!-- Set the maximum size for an unadorned file upload. -->
+
+            <init-param>
+               <param-name>maxunadorneduploadfilesize</param-name>
+               <param-value>5m</param-value>
+            </init-param>
+
+            <!-- Set the maximum size for an adorned file upload. -->
+
+            <init-param>
+               <param-name>maxadorneduploadfilesize</param-name>
+               <param-value>50m</param-value>
+            </init-param>
+
+            <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <!-- Restlet adapter -->
+
+    <servlet>
+            <servlet-name>RestletServlet</servlet-name>
+            <servlet-class>
+               org.restlet.ext.servlet.ServerServlet
+            </servlet-class>
+            <init-param>
+               <param-name>org.restlet.application</param-name>
+               <param-value>edu.northwestern.at.morphadorner.server.MorphAdornerServerApplication</param-value>
+            </init-param>
+            <init-param>
+               <param-name>org.restlet.clients</param-name>
+               <param-value>HTTP HTTPS FILE</param-value>
+            </init-param>
+            <load-on-startup>2</load-on-startup>
+    </servlet>
+
+    <!-- Catch all requests -->
+
+    <servlet-mapping>
+            <servlet-name>RestletServlet</servlet-name>
+            <url-pattern>/*</url-pattern>
+    </servlet-mapping>
+
+</web-app>
+

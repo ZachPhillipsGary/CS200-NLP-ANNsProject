@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0">
+  <teiHeader>
+    <fileDesc>
+      <titleStmt>
+        <title>Mary's Little Lamb.</title>
+        <author>Sarah Josepha Hale.</author>
+      </titleStmt>
+      <publicationStmt>
+        <p>Originally published in Boston in 1830.</p>
+      </publicationStmt>
+      <sourceDesc>
+        <p></p>
+      </sourceDesc>
+    </fileDesc>
+  </teiHeader>
+  <text xml:lang="eng">
+    <body>
+      <lg type="verse">
+        <head>
+          <w lemma="Mary" ana="#npg1" reg="MARY'S" xml:id="marylamb-030">MARY'S</w>
+          <c> </c>
+          <w lemma="little" ana="#j" reg="LITTLE" xml:id="marylamb-040">LITTLE</w>
+          <c> </c>
+          <w lemma="lamb" ana="#n1" reg="LAMB" xml:id="marylamb-050">LAMB</w>
+          <pc xml:id="marylamb-060" unit="sentence">.</pc>
+        </head>
+        <lg type="stanza">
+          <l>
+            <w lemma="Mary" ana="#np1" reg="Mary" xml:id="marylamb-100">Mary</w>
+            <c> </c>
+            <w lemma="have" ana="#vhd" reg="had" xml:id="marylamb-110">had</w>
+            <c> </c>
+            <w lemma="a" ana="#dt" reg="a" xml:id="marylamb-120">a</w>
+            <c> </c>
+            <w lemma="little" ana="#j" reg="little" xml:id="marylamb-130">little</w>
+            <c> </c>
+            <w lemma="lamb" ana="#n1" reg="lamb" xml:id="marylamb-140">lamb</w>
+            <pc xml:id="marylamb-150">,</pc>
+          </l>
+          <l>
+            <w lemma="its" ana="#po31" reg="Its" xml:id="marylamb-180">Its</w>
+            <c> </c>
+            <w lemma="fleece" ana="#n1" reg="fleece" xml:id="marylamb-190">fleece</w>
+            <c> </c>
+            <w lemma="be" ana="#vbds" reg="was" xml:id="marylamb-200">was</w>
+            <c> </c>
+            <w lemma="white" ana="#j-jn" reg="white" xml:id="marylamb-210">white</w>
+            <c> </c>
+            <w lemma="as" ana="#c-acp" reg="as" xml:id="marylamb-220">as</w>
+            <c> </c>
+            <w lemma="snow" ana="#n1" reg="snow" xml:id="marylamb-230">snow</w>
+            <pc xml:id="marylamb-240" unit="sentence">.</pc>
+          </l>
+          <l>
+            <w lemma="and" ana="#cc" reg="And" xml:id="marylamb-270">And</w>
+            <c> </c>
+            <w lemma="every" ana="#d" reg="every" xml:id="marylamb-280">every</w>
+            <c> </c>
+            <w lemma="where" ana="#c-crq" reg="where" xml:id="marylamb-290">where</w>
+            <c> </c>
+            <w lemma="that" ana="#d" reg="that" xml:id="marylamb-300">that</w>
+            <c> </c>
+            <w lemma="Mary" ana="#np1" reg="Mary" xml:id="marylamb-310">Mary</w>
+            <c> </c>
+            <w lemma="go" ana="#vvd" reg="went" xml:id="marylamb-320">went</w>
+          </l>
+          <l>
+            <w lemma="the" ana="#dt" reg="The" xml:id="marylamb-350">The</w>
+            <c> </c>
+            <w lemma="lamb" ana="#n1" reg="lamb" xml:id="marylamb-360">lamb</w>
+            <c> </c>
+            <w lemma="be" ana="#vbds" reg="was" xml:id="marylamb-370">was</w>
+            <c> </c>
+            <w lemma="sure" ana="#j" reg="sure" xml:id="marylamb-380">sure</w>
+            <c> </c>
+            <w lemma="to" ana="#pc-acp" reg="to" xml:id="marylamb-390">to</w>
+            <c> </c>
+            <w lemma="go" ana="#vvi" reg="go" xml:id="marylamb-400">go</w>
+            <pc xml:id="marylamb-410" unit="sentence">.</pc>
+          </l>
+        </lg>
+      </lg>
+    </body>
+  </text>
+</TEI>

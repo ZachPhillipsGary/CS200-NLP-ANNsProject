@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<ivysettings >
+    <settings defaultResolver="default" />
+    <include url="${ivy.default.settings.dir}/ivysettings-shared.xml"/>
+    <include url="${ivy.default.settings.dir}/ivysettings-local.xml"/>
+    <resolvers>
+        <chain name="public">
+            <ibiblio name="maven2" m2compatible="true" />
+            <ibiblio name="restlet" m2compatible="true"
+                     root="http://maven.restlet.org/" />
+        </chain>
+        <url name="morphadornerlibs">
+            <artifact
+                pattern="http://morphadorner.northwestern.edu/morphadornerlibs/[module]/[artifact]-[revision].[ext]" />
+        </url>
+    </resolvers>
+    <include url="${ivy.default.settings.dir}/ivysettings-main-chain.xml" />
+    <include url="${ivy.default.settings.dir}/ivysettings-default-chain.xml" />
+    <modules>
+        <module organisation="morphadornerlibs" name="icu4j"
+                resolver="morphadornerlibs"/>
+        <module organisation="morphadornerlibs" name="icu4j-charset"
+                resolver="morphadornerlibs"/>
+        <module organisation="morphadornerlibs" name="icu4j-localespi"
+                resolver="morphadornerlibs"/>
+        <module organisation="morphadornerlibs" name="jaws"
+                resolver="morphadornerlibs"/>
+        <module organisation="morphadornerlibs" name="jettison"
+                resolver="morphadornerlibs"/>
+        <module organisation="morphadornerlibs" name="log4j"
+                resolver="morphadornerlibs"/>
+        <module organisation="morphadornerlibs" name="morphadorner"
+                resolver="morphadornerlibs"/>
+        <module organisation="morphadornerlibs" name="msv"
+                resolver="morphadornerlibs"/>
+        <module organisation="morphadornerlibs" name="servlet-api"
+                resolver="morphadornerlibs"/>
+        <module organisation="morphadornerlibs" name="tcfxb"
+                resolver="morphadornerlibs"/>
+        <module organisation="morphadornerlibs" name="texhyphj"
+                resolver="morphadornerlibs"/>
+        <module organisation="morphadornerlibs" name="xstream"
+                resolver="morphadornerlibs"/>
+    </modules>
+</ivysettings>

@@ -1,0 +1,391 @@
+<project name="maserver" default="all" basedir="."
+    xmlns:ivy="antlib:org.apache.ivy.ant"
+>
+
+<!-- This is the Ant build script for MorphAdorner Server. -->
+
+    <!-- ========================================================= -->
+    <!-- Import user-definable build settings.                     -->
+    <!-- ========================================================= -->
+
+    <property file="build.properties" />
+
+    <!-- ========================================================= -->
+    <!-- You probably don't need to change the remaining settings. -->
+    <!-- ========================================================= -->
+
+    <!-- The server application name, -->
+
+    <property name="app.name"     value="maserver"/>
+
+    <!-- The parent directory of the Java source files. -->
+
+    <property name="src.dir"      value="src"/>
+
+    <!-- The parent directory of the Java class files. -->
+
+    <property name="bin.dir"      value="bin"/>
+
+    <!-- The configuration files directory.  -->
+
+    <property name="conf.dir"     value="conf"/>
+
+    <!-- The directory containing the MorphAdorner server -->
+    <!-- JAR and WAR files.                   -->
+
+    <property name="dist.dir"     value="dist"/>
+
+    <!-- The JAR file containing the MorphAdorner server code. -->
+
+    <property name="dist.jar"     value="${app.name}.jar"/>
+    <property name="dist.war"     value="${app.name}.war"/>
+    <property name="data.dir"     value="data"/>
+    <property name="javadoc.dir"  value="javadoc"/>
+    <property name="webpages.dir" value="webpages"/>
+
+    <!-- The compiler version. -->
+
+    <property name="build.compiler"       value="modern"/>
+    <property name="build.compiler.emacs" value="true"/>
+
+    <!-- The jar files directory for third-party software. -->
+
+    <property name="lib.dir" value="lib"/>
+
+    <!-- The version of Apache Ivy to install. -->
+
+    <property name="ivy.install.version" value="2.3.0"/>
+
+    <!-- The Apache Ivy configuration files. -->
+
+    <property name="ivy.jar.file" value="${lib.dir}/ivy.jar"/>
+    <property name="ivy.lib.dir"  value="${lib.dir}"/>
+
+    <!-- Macro to require that a property be set and not empty. -->
+
+    <macrodef name="prop-require">
+    <attribute name="prop"/>
+        <sequential>
+            <fail message="Property &quot;@{prop}&quot; must be set">
+            <condition>
+                <not>
+                <isset property="@{prop}"/>
+                </not>
+               </condition>
+            </fail>
+
+            <fail message="Property &quot;@{prop}&quot; must not be empty">
+                <condition>
+                <equals arg1="${@{prop}}" arg2=""/>
+               </condition>
+            </fail>
+            </sequential>
+    </macrodef>
+
+    <!-- Apache Ivy ant tasks library. -->
+
+    <path id="ivy.lib.path">
+        <fileset dir="${lib.dir}" includes="ivy*.jar"/>
+    </path>
+
+    <!-- Library jar files ID. -->
+
+    <path id="lib.path.id">
+        <fileset dir="${lib.dir}" />
+    </path>
+
+    <!-- Java class path. -->
+
+    <path id="classpath">
+        <pathelement path="."/>
+        <pathelement path="${bin.dir}"/>
+        <path        refid="lib.path.id"/>
+    </path>
+
+    <!-- Download ivy if not already done. -->
+
+    <target name="download-ivy" unless="skip.download">
+        <mkdir dir="${lib.dir}"/>
+        <echo message="Installing ivy..."/>
+        <get src="http://repo1.maven.org/maven2/org/apache/ivy/ivy/${ivy.install.version}/ivy-${ivy.install.version}.jar"
+            dest="${ivy.jar.file}"
+            usetimestamp="true"/>
+    </target>
+
+    <!-- Install ivy if not already done. -->
+
+    <target name="install-ivy"
+        depends="download-ivy"
+        description="Install ivy">
+        <path id="ivy.lib.path">
+            <fileset dir="${lib.dir}" includes="ivy*.jar"/>
+        </path>
+        <taskdef resource="org/apache/ivy/ant/antlib.xml"
+            uri="antlib:org.apache.ivy.ant"
+            classpathref="ivy.lib.path"
+        />
+    </target>
+
+    <!-- Resolve dependencies using ivy. -->
+
+    <target name="resolve"
+        depends="install-ivy"
+        description="Retrieve dependencies using ivy">
+        <ivy:retrieve type="jar"/>
+    </target>
+
+    <!-- Create the output directories for the classes and javadocs -->
+
+    <target
+        name="init"
+        depends="resolve"
+        description="Create classes and javadocs directories"
+    >
+        <mkdir  dir="${bin.dir}"/>
+        <copy todir="${bin.dir}/">
+            <fileset dir="${conf.dir}/"
+                includes="log4j.properties"/>
+        </copy>
+        <copy todir="${bin.dir}/edu/northwestern/at/morphadorner/server/resources">
+            <fileset dir="${conf.dir}/"
+                includes="wadl.xsl"/>
+        </copy>
+        <mkdir  dir="${dist.dir}"/>
+        <mkdir  dir="${javadoc.dir}"/>
+    </target>
+
+    <!-- Delete the output directories for the classes and javadocs -->
+
+    <target
+        name="clean"
+        description="Delete classes and javadocs directories"
+    >
+        <delete dir="${javadoc.dir}"/>
+        <delete dir="${bin.dir}"/>
+        <delete dir="${dist.dir}"/>
+        <delete file="${conf.dir}/web.xml"/>
+    </target>
+
+    <!-- Delete the library directory. -->
+
+    <target
+        name="cleanlib"
+        description="Delete libraries directory"
+    >
+        <delete dir="${lib.dir}"/>
+    </target>
+
+    <!-- Clean the ivy cache. -->
+
+    <target
+        name="cleancache"
+        depends="install-ivy"
+        description="Cleans the Ivy cache"
+    >
+        <ivy:cleancache />
+    </target>
+
+    <!-- Compile the source code (in 'src') and store in 'bin' -->
+
+    <target
+        name="compile"
+        depends="init"
+        description="Compile the source code"
+    >
+        <javac
+            srcdir="${src.dir}"
+            destdir="${bin.dir}"
+            classpathref="classpath"
+            debug="on"
+            target="1.6"
+            source="1.6"
+            deprecation="on"
+            includeantruntime="false">
+            <compilerarg value="-Xlint:unchecked,-options"/>
+        </javac>
+    </target>
+
+    <!-- Generate the javadocs for the source code -->
+
+    <target
+        name="javadoc"
+        description="Generate javadocs"
+        depends="compile"
+    >
+        <mkdir dir="${javadoc.dir}"/>
+        <javadoc
+            sourcepath="${src.dir}"
+            classpathref="classpath"
+            packagenames="edu.*"
+            destdir="${javadoc.dir}"
+        >
+            <doctitle><![CDATA[<h2>MorphAdorner Server</h2>]]></doctitle>
+        </javadoc>
+    </target>
+
+    <!-- Generate the jar file -->
+
+    <target
+        name="jar"
+        depends="compile" description="Generate the jar file"
+    >
+        <jar destfile="${dist.dir}/${dist.jar}">
+            <fileset dir="${bin.dir}"/>
+            <manifest>
+            </manifest>
+        </jar>
+    </target>
+
+    <!-- Zip up the source code -->
+
+    <target
+        name="zipsource"
+        description="Create a zip file of the source code"
+    >
+        <zip
+            basedir="."
+            destfile="./${app.name}-src.zip"
+            includes="build.xml, ${src.dir}/**"
+        />
+    </target>
+
+    <!-- Create web.xml file -->
+
+    <target
+        name="webxml"
+        description="Create web.xml files from template"
+    >
+        <copy file="${conf.dir}/template-web.xml"
+            tofile="${conf.dir}/web.xml">
+            <filterset>
+                <filtersfile file="${conf.dir}/web-xml.properties" />
+            </filterset>
+        </copy>
+    </target>
+
+    <!-- Create server war file. -->
+
+    <target
+        name="war"
+        depends="clean,jar,webxml"
+        description="Create a war file of the maserver webapp"
+    >
+        <war
+            destfile="${dist.dir}/${dist.war}"
+            webxml="${conf.dir}/web.xml"
+            basedir="${webpages.dir}"
+        >
+            <classes dir="bin" />
+            <lib dir="${lib.dir}">
+                <include name="commons-fileupload-1.2.2.jar"/>
+                <include name="commons-io-2.0.1.jar"/>
+                <include name="icu4j-51.1.jar"/>
+                <include name="icu4j-charset-51.1.jar"/>
+                <include name="icu4j-localespi-51.1.jar"/>
+                <include name="isorelax-jaxp-bridge-ILM-1.1.jar"/>
+                <include name="isorelax-20030108.jar"/>
+                <include name="jackson-core-asl-1.9.8.jar"/>
+                <include name="jackson-mapper-asl-1.9.8.jar"/>
+                <include name="java-property-utils-1.9.jar"/>
+                <include name="jaws-1.3.jar"/>
+                <include name="jdom2-2.0.4.jar"/>
+                <include name="jettison-1.3.jar"/>
+                <include name="json-20090211.jar"/>
+                <include name="jsonic-1.3.0.jar"/>
+                <include name="jsslutils-1.0.5.jar"/>
+                <include name="jul-to-slf4j-1.5.8.jar"/>
+                <include name="log4j-1.2.15.jar"/>
+                <include name="morphadorner-2.0.1.jar"/>
+                <include name="msv-2008.02.13.jar"/>
+                <include name="org.restlet.ext.fileupload-2.1.0.jar"/>
+                <include name="org.restlet.ext.html-2.1.0.jar"/>
+                <include name="org.restlet.ext.jackson-2.1.0.jar"/>
+                <include name="org.restlet.ext.json-2.1.0.jar"/>
+                <include name="org.restlet.ext.servlet-2.1.0.jar"/>
+                <include name="org.restlet.ext.ssl-2.1.0.jar"/>
+                <include name="org.restlet.ext.wadl-2.1.0.jar"/>
+                <include name="org.restlet.ext.xml-2.1.0.jar"/>
+                <include name="org.restlet.ext.xstream-2.1.0.jar"/>
+                <include name="org.restlet-2.1.0.jar"/>
+                <include name="portlet-api-1.0.jar"/>
+                <include name="relaxngDatatype-1.0.jar"/>
+                <include name="serializer-2.7.1.jar"/>
+                <include name="simple-4.1.21.jar"/>
+                <include name="slf4j-api-1.5.8.jar"/>
+                <include name="slf4j-log4j12-1.5.8.jar"/>
+                <include name="stax-api-1.0-2.jar"/>
+                <include name="tcfxb-0.4.jar"/>
+                <include name="texhyphj-1.1.jar"/>
+                <include name="xalan-2.7.1.jar"/>
+                <include name="xercesImpl-2.9.1.jar"/>
+                <include name="xml-apis-2.0.2.jar"/>
+                <include name="xml-resolver-1.2.jar"/>
+                <include name="xmlpull-1.1.3.1.jar"/>
+                <include name="xpp3_min-1.1.4c.jar"/>
+                <include name="xsdlib-20060615.jar"/>
+                <include name="xstream-1.3.1.jar"/>
+            </lib>
+        </war>
+    </target>
+
+    <!-- Copy data to server directory. -->
+
+    <target
+        name="copyserverdata"
+        description="Copy data to server data directory."
+    >
+        <prop-require prop="serverdata.dir" />
+        <mkdir dir="${serverdata.dir}"/>
+        <copy todir="${serverdata.dir}/">
+            <fileset dir="${data.dir}"/>
+        </copy>
+    </target>
+
+    <!-- Run the local tests. -->
+
+    <target name="runlocaltests" depends="compile">
+        <prop-require prop="localServerURL" />
+        <junit fork="yes" maxmemory="640m" haltonfailure="true">
+            <sysproperty
+                key="baseServerURL"
+                value="${localServerURL}"
+            />
+            <classpath refid="classpath"/>
+            <formatter type="brief" usefile="false"/>
+            <batchtest>
+                <fileset dir="${bin.dir}">
+                    <include name="edu/northwestern/at/morphadorner/server/tests/Test*.class"/>
+                </fileset>
+            </batchtest>
+        </junit>
+    </target>
+
+    <!-- Run the remote tests. -->
+
+    <target name="runremotetests" depends="compile">
+        <prop-require prop="remoteServerURL" />
+        <junit fork="yes" maxmemory="640m" haltonfailure="true">
+            <sysproperty
+                key="baseServerURL"
+                value="${remoteServerURL}"
+            />
+            <classpath refid="classpath"/>
+            <formatter type="brief" usefile="false"/>
+            <batchtest>
+                <fileset dir="${bin.dir}">
+                    <include name="edu/northwestern/at/morphadorner/server/tests/Test*.class"/>
+                </fileset>
+            </batchtest>
+        </junit>
+    </target>
+
+    <!-- Generate everything except server data directory from scratch. -->
+
+    <target
+        name="all"
+        depends="clean,javadoc,war"
+        description="Run the clean, javadoc, war targets"
+    />
+
+</project>
+

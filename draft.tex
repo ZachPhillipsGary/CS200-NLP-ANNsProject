@@ -1,0 +1,139 @@
+
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+
+\title{Verb Tense Error Detection with Artificial Neural Networks (DRAFT)}
+\author{Zach Phillips-Gary}
+\date{March 2016}
+\usepackage{setspace}
+%\singlespacing
+\doublespacing
+\usepackage{natbib}
+\usepackage{graphicx}
+\usepackage[]{algorithm2e}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+A significant amount of time and energy has been devoted to developing software to identify and correct grammatical errors in natural language texts. Contemporary efforts in this sphere of research have focused on utilizing machine learning algorithms to classify sentences as either grammatically correct or incorrect and then to dynamically rectify the errors within the subset of incorrect sentences.  In this paper, we shall examine the performance of two classes of machine learning algorithms (Artificial Neural Networks (RANNs) and Naïve Bayes classifiers (NB)) in determining whether a given sentence in a body of English text contains a verb tense disagreement error. Formally stated, a sentence in the English language contains a verb-tense disagreement error if the tense of the verb isn’t in agreement with the tense of the subject. For example, the phrase “The cow jumping over the fence.” clearly contains an instance of this class of grammatical error, yet major contemporary word-processing tools fail to recognize the sentence as incorrect. For our analysis, we shall treat the verb tense disagreement error as an extension of the general binary classification problem in machine learning. Our primary goal with this project will be to attempt to replicate the results of Dr. Andrew Smith's article \textit{Grammar Inference Using Recurrent Neural Networks} \citep{Smith_grammarinference} on a particular subset of grammar inference problem (verb tense error detection) using recurrent artificial neural networks. To this end, we will implement a series of python scripts to alter and tag a corpus of English text and then perform classification upon it with the aim of detecting grammatical errors of the type described above.
+
+\section{Natural Language Processing and Machine Learning }
+Natural language processing (NLP) is a subfield of computer science and artificial intelligence that seeks to utilize computers to derive information from natural language. Modern techniques in NLP often use statistical machine learning methods to infer information about a corpus or corpora of text. Our project is a classic example of an automated proof reading problem in the field of NLP, however in solving this problem we will also utilize several other major area of study in NLP domain. For example, our application will depend heavily upon algorithms that perform part-of-speech (POS) tagging to be able to identify verbs in a sentence and determine if said verb is in the proper tense for the sentence in question. Although not the focus of this project, the tagging algorithms we shall utilize will reply heavily upon machine learning techniques \citep{NLPML} to correctly parse and tag a string of natural language text. From these POS tagging algorithms, we will obtain a tagged version of our corpus, this "tagged" corpus will contain the original text, annotated with machine readable meta data that will allow our software to "understand" what role each word plays in the sentence and thus infer whether the sentence in question is grammatically correct or not. POS tagging is a more complex and nuanced process than mere tokenization, because it take into account subtle word usage and appropriately tag a word even when used in unorthodox contexts. For example, the phrase "The sailor dogs the hatch." utilizes the term "dog" as a verb and not a noun. Simple regular expression based tokenization procedures fail to recognize this idiosyncratic usage of one of this elementary term. Because of the complexity of the POS tagging task and the myriad of well developed software tools available to solve this task, we shall utilize the NLTK (natural language tool kit) POS-tagger class to compute this information for us, leaving us to focus on the task of identifying verb tense errors in the tagged text. 
+
+\section{A Brief Introduction to Machine Learning }
+Machine learning algorithms have been in use in the field of computer science since late 1950s and are integral to numerous fields of Computer Science including Computer Vision, Natural Language Processing, Robots, Computer Security and Bioinformatics. Despite its age, the Naïve Bayes classifier (NBc) has been proven to remain a viable tool in NLP applications \citep{russell2003artificial} \citep{AnderewNG} , thus we shall use it as a point of contrast to compare the performance of our ANN algorithms with. The Naïve Bayes classifier is a family of algorithms that solve the binary classification problem probabilistically by applying Bayes' law by making independence assumptions between the set features. We shall compare the performance of this machine learning algorithm with two different types of Artificial Neural Network machine learning algorithm: Recurrent Neural Networks and Feed-forward Neural Networks. Contrary to popular belief, artificial neural network algorithms are merely a class of machine learning algorithm that use neurological models as an inspiration for how to implement algorithms that can infer information about a data set. We shall provide a detailed account of each of these terms in the sections below.
+
+\subsection{Binary Classification Problem}
+The binary classification problem is one of the most frequently studied in the field of machine learning. Binary classification has a myriad of applications in machine learning and in the subfield of natural language processing (NLP). In its most simple form, the binary classification problem can be stated as follows: given a scattering $x$ in a domain $X$, estimate which value an associated random variable $y \in \{ \pm 1\}$ will assume \citep{Smola08introductionto}. Turing to the problem at hand, we shall treat each sentence as an atomic entity, containing at most a single instance of the verb tense disagreement and at least zero instances of this class of grammatical error. Formally stated, our project shall attempt to classify sentences as either containing verbs that are in the proper tense for the context of the sentence or containing verbs in an improper tense for the sentence in question. 
+    Geometrically, we can think of binary classification as imposing a polynomial fit upon  a data set mapped to a two dimensional plane. As you can see, all elements of our dataset belong to exactly one subset (illustrated by the line running across the screen). 
+\begin{center}
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.5]{mlplaceholder.jpg}
+\caption{Classification results from 60\% altered copy of the BROWN corpus with the Naive Bayes algorithm.  }
+\label{fig:univerise}
+\end{figure}
+\end{center}
+In conclusion, binary classification is a simple yet frequently encountered problem in machine learning.  As we shall describe in future sections, a wide array of machine learning algorithms exist to solve this class of problem. However, there is no single machine learning algorithm that is optimal for every class of machine learning problem (as demonstrated by David Wolpert in \textit{No Free Lunch Theorems for Optimization} \citep{ref1}) hence, the optimal algorithm for a particular application can only be determined through a mixture of theory and experimental testing. 
+\subsection{Supervised learning}
+Some machine learning algorithms require the existence of a \underline{training set} in order classify raw data into a series of categories. This training set contains data that is similar to the type of raw data the algorithm will be expected to categorize but in which each element has be prelabeled with the appropriate category it ought to be placed in. Both the control algorithm (NBc) and our ANNs use supervised learning, hence they must be provided with a set correctly labeled data to be able to infer any meaningful conclusions about the raw data. A corollary feature of supervised learning algorithms is that the quality of their predictions about a particular piece of data is as dependent upon the quality of their training set as it is upon quality of the implementation of the algorithm. As a result, supervised learning algorithms are often poorly suited to natural language processing error detection applications, as natural languages are subtle in nature and it often hard to obtain a training corpus of sufficient size to be useful.
+However, supervised learning algorithms proved to be a good fit for our project, due to the relative simplicity of introducing errors of the class we are attempting detect into a corpus of text in comparison with other projects in the realm of natural language processing. 
+\subsection{Artificial Neural Networks Fundamentals}
+Artificial Neural Networks (ANN) are a class of machine learning algorithm inspired by neural cells in mammalian brains. At its core, neurons are simple a many-inputs to one output unit, much like a flip-flop circuit. In an ANN, we restrict the possible input/output values to a binary set of values (i.e: -1,1). 
+Neurons continuously evaluate their output by looking at their inputs, calculating the weighted sum of the inputs comparing it to a threshold to determine if they should fire or not. Alone, a single neuron is no nothing more than a series of conditionals. The power of neurons, both in \textit{in silico} and \textit{in vivo} comes from placing them into an interconnected network with other neurons, this "neural network" has unique evolutionary properties which both traditional algorithms and solo neurons lack. Eventually, a neural network will reach a point in which all neurons continue to evaluate their inputs but in which no further changes in their state occur, this state of stability is dependent on both the value of the inputs into the network, the weights on said inputs, and the neuron thresholds. 
+\subsubsection{Recurrent vs Feed-forward Artificial Neural Networks}
+\underline{Feed-forword ANNs} are one of the simpler ANN architectures. An artificial neural network is a said to be feed-forward when the output from one layer of neurons feeds forward into the next layer of neurons. There are no backward connections, and connections do not bypass any layers to connect to another. Typically, the layers in a feed-forword ANNs are fully connected, meaning that all of the units at one layer are connected with all units at the next layer in the network. In contrast, the connections between neurons \underline{recurrent neural network}  form a directed cycle. Recurrent neural networks typically are more powerful than feed-forward neural networks since they have the ability to use their internal memory to process arbitrary sets of information. However, feed-forward neural networks are simpler to implement and can compute solutions faster than their more advanced counterparts. We will be testing both types of ANN to determine whether the increased complexity of a recurrent neural network results in increased accuracy in our results.  Contemporary research suggests that the only Elman network architecture \citep{Smith_grammarinference} that offers notable gains in accuracy over the more basic Naive Bayes classifier algorithm.
+\subsubsection{Elman ANN architecture}
+Elman networks consist of a series of three layers. Elman networks are distinguished from ordinary multilayer recurrent ANNs by the addition of a series of connections between the middle layer (often refereed to as the "hidden" layer in machine learning literature \citep{neuralnets}) and a set of context units fixed with a weight of one. At each time-instance $t$, the input is propagated through the network in the same manner as in a feed-forward ANN. However, a series of fixed back connections result in the context neurons retaining a copy of the previous values of the hidden units. Thus the network has a basic form of persistence of information between time-steps \citep{Smola08introductionto}, allowing it to perform such task that are beyond the power of a standard multilayer ANN.  
+\subsection{Naive Bayes}
+The Naive Bayes classification algorithm is based upon a conditional probability model. Software implementations of NBc convert the features to be classified into a vector of feature values. The algorithm assigns this feature vector a set of probabilities for each possible outcome. For our purposes, let us assume that x denotes the actual text of corpora being tested for grammatically errors and y is equivalent to the test for said errors. By Bayes rule, we cna infer:
+$$ p(y|x)=\frac{p(x|y)p(y)}{p(x)}$$ . Now assume that we have a reasonable estimate of the likely-hood of given sentence in our corpus containing a grammar error of the class we are filtering for. Since we are generating this data ourselves, we will know exactly how many incorrect sentences are in our text. However, in the real world we can only estimate this figure. Hence, we estimate that $p(correct) 	\approx \frac{m_{correct}}{m}$ (where $m_{correct}$ is the number of grammatically correct sen tenses in our corpus. Accordingly, we also assume that the value of $p(incorrect)$ approximately equal to $\frac{m_{incorrect}}{m}$. Since we do not know the value of $p(x|y) or p(x)$, we must disregard the requirement that we know the value of $p(x)$ and must instead settle for a likelihood ratio \citep{Smola08introductionto}. Hence, we let $L(x) = \frac{p(correct|x)p(incorrect)}{p(x|incorrect)p(correct)}$, and when the value $L(x)$ falls outside of a particular  threshold $c$, the sentence in question is said to be grammatically incorrect. When $c$ becomes very large, fewer sentences will be classified as grammatically incorrect. But when $c$ is too small, our algorithm will admit an unacceptable number of false positives. Neither of these outcomes is attractive, but we have few options since we do not know $p(x|y)$. In order to rectify this state of affirms, we assume that each test case is conditionally independent \citep{Smola08introductionto} and treat each sentence in the corpus (our atomic unit) as a  separate and discrete test. We then combine the outcomes  of these in a "naive fashion by assuming that" \citep{Smola08introductionto} $p(x|y) = (\prod^{$sentences in corpus x$}_{j=1} p(w^j|y)$ where $w^j$ denotes the j-th sentence in a given corpus. Essentially, this statement is equivalent to the assumption that the probability of the occurrence of a single grammatical error of the class in question in a sentence within the corpus has no relationship with the probability of the occurrence of a grammatical error in another sentence within the corpus. This assumption is unproblematic for our application, as it is very possible for a body of text to contain a grammar error in only one of sentences. Besides ensuring that the presence or lack of grammar errors in one sentence will prejudice our algorithm towards the corpus at large, this assumption also simplifies the issue of knowing p(x|y) to that of estimating the probabilities of the occurrence of a grammar error in a particular sentence $w$. We can use the build-in functionality of our natural language processing library to compute the number of verbs within a given corpus and from that information, determine the probability of a given sentence containing an error of the class we are attempting to demarcate. Thus, we can arrive at a reasonable estimate of  probabilities of a given sentence containing a grammatical error in a single iteration through our corpus. 
+\subsection{Parts of Speech (POS) Tagging }
+Classifying words within a sentence based upon their role in the sentence is
+\section{Methodology}
+As eluded to in the introduction of this paper, the goal of this project is to attempt to replicate the results of \citep{Smith_grammarinference} for specific case of grammatical error (namely, improper verb tense errors) on a larger set corpora than used in the cited paper. To this end, we shall implement a tool for introducing improper verb tense errors into a body of grammatically valid text and tagging it accordingly. Next, we shall implement an Elman architecture ANN and a feed-forward ANN and compare the rate of error detection with these two algorithms with the performance of a industry-standard NLP library's NBc implementation. According to the experimental results from \citep{Smith_grammarinference}, we ought find the Elman network offers superior results to that of the NBc algorithm. However, the Elman network was only tested on a very simple subset of the BROWN corpus and was utilized to find a wider array of grammatical errors than in our project. In this section, we shall describe our software implementation and training process in detail. The following graphic offers and outline of the application workflow and will described in detail in the next few sections.
+
+\subsection{Application Workflow}
+\begin{center}
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.3]{CS_JIS_Flowchart.png}
+\caption{Application Dataflow}
+\label{fig:univerise}
+\end{figure}
+\end{center}
+
+\subsection{Corpora preprocessing}
+A major challenge in this project was obtaining a corpus which contained relevant metadata to our project. Thankfully, the NLTK (Natural language tool kit) library comes bundled with a series of tools for encoding natural language text with machine readable tags which allows us to skip the complex task of tokenizing strings of raw text and tagging each word with its grammatically role in the sentence (past-tense verb, noun, adverb, etc). We shall be using a version of the BROWN corpus which has been tagged with using the TEI metadata standard, a widely used format within in the NLP community. The BROWN corpus contains 500 samples of English-language text, totaling roughly one million words. \citep{Brown}
+\begin{center}
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.5]{classify-py.jpg}
+\caption{Natural language tagging and preprocessing workflow}
+\label{fig:univerise}
+\end{figure}
+\end{center}
+
+
+Because the BROWN corpus contains only samples of grammatically correct English, we must computationally introduce a series of grammatical errors of the class we wish to study into the corpus. Thus, we have devised a simple "corrupter" script which introduces verb tense errors into a copy of the BROWN corpus and tags them accordingly. The script (henceforth referred to as "corrupt.py")
+iterates through the corpus and randomly selects verbs to alter the tense of. To ensure rigorous experimental results, we shall create several different copies of the BROWN dataset, each with a different ratio of sentences with correct verb tense usage to invalid verb tense usage. The table below contains a description of each modified instance of the BROWN corpus:
+\begin{center}
+
+\begin{tabular}{ l l l }
+
+    \hline			
+
+
+  Name & Percentage of modified verbs  & Github
+  Link \\
+  BROWN 60 & 60\% of verbs have been altered & - \\
+   BROWN 25 & 25\% of verbs have been altered & - \\
+    \hline  
+\end{tabular}
+\newline
+Table 1: Description of Modified Corpora 
+
+\end{center}
+    
+
+At the core of the corrupt.py script is the randomly\_alter\_verb() procedure. This function  replaces a particular percentage of the verbs within the corpus with instances of the verb in a different tense. We use the Verbix verb conjugation service \citep{verbix} to obtain the an alternative conjugate of the verb in question. The results from each API call are stored in a Python dictionary (hash table) so other conjugates can be obtained without an HTTP request in the future. 
+\begin{center}
+\begin{algorithm}[H]
+ \KwData{TEI encoded corpus}
+ \KwResult{N\% of verbs within the given corpus have a different tense}
+ listCount = 0\;
+ verbs = list containing every verb instance in corpus\;
+ \While{listCount \le verbs.length}{
+  get tense of present verb in list\;
+  \eIf{pickRandomSetElement() == true}{
+  \eIf{verb in dictionary}{
+    replace with random alternative tense from the dictionary\;
+    }{
+    make HTTP request to get verb conjugates
+    place conjugates in dictionary
+     replace with random alternative tense from the dictionary\;
+    }
+   }{
+   tag verb with unedited flag\;
+  }
+  listCount++\;
+ }
+ \caption{randomly\_alter\_verb() procedure pseudocode}
+\end{algorithm}
+\end{center}
+
+Having described the modified scheme utilized to create the training set and testing data, we now turn our attention to the classification software itself. As with corrupt.py, the classifiers themselves depend heavily upon the NLTK library to tokenize and interpret the TEI metadata and the corpora itself. Our artificial neural networks have been implemented using the PyBrain library, while the Naive Bayes classifier will simply be an the vanilla implementation that comes bundled with the NLTK library. Since NLTK is used in a myriad of professional and academic applications and was created by a team of developers with years of experience in the field of NLP, it shall serve as an ideal baseline to compare our own implementations against. Returning to our ANNs, we shall be using the PyBrain library's RecurrentNetwork and FeedForwardNetwork classes for our ANN implementation. Both of these classes and the library itself are well documented and have been optimized to compute results from large data-sets with relative speed and without error. Both PyBrain and NLTK utilize the NumPy library to quickly and efficiently perform computations upon matrices, a key mathematical operation in both the  NBc and ANN classification algorithms and in machine learning at large. 
+
+As illustrated in figure 2 and described above, the training corpora are preprocessed by corrupt.py in order to introduce grammatical errors into the dataset. The dataset is then split into two subsets, one of which is utilized as a training set and the other of which as a metric for testing the accuracy of the algorithm. The demarcation of the testing set from the training set will be performed pseudorandomly for each corpora tested. Because of the nature of the English language and the content of the BROWN corpus, it is almost guaranteed that a nontrivial number of sentences from the training set will be present in the validation / testing set. However, this behavior is expected to occur within any non-curated dataset the application might be called upon to categorize and hence is unproblematic.  Once a specified percentage of the data has been randomly altered by corrupt.py, the corpus is then divided into the training set and testing set by split.py. Finally, the training set is loaded into a ClassificationDataSet data structure so speed and ease of use by PyBrain. ClassificationDataSet is a class in the PyBrain library which abstracts away many of the common matrix operations required to create a dataset for supervised learning ANNs in Python. (Additional information about ClassificationDataSet is available at  \citep{ClassifyPyBrain}.) Before being placed into a ClassificationDataSet object, corpus date will be tokenized using NLTK and reduced to a set of vectors pairing the TEI tense and work type metadata with the given term in the sentense. Furthermore, sentenses will be   classify.py will run the data through our three classification algorithms, a feedforward ANN, a recurrent ANN and the NTLK library's built-in Naive Bayes classifier. The results from each algorithm will be visualized on a 2d graph using the Pandas library \citep{PANDASpy} and each instance of a grammar error in the corpus will be flagged accordingly in the corpus and outputted as plain text to a text file in the working directory. In addition, the detection rate will be calculated by comparing the training subset with the testing subset.
+\subsection{Experimental measurement}
+For our NBc, we shall verify the experimental results using the nltk.classify.accuracy method. This method will allow us to compare the training set with the testing set and receive percentage result. This tool will allow us detect when over fitting has occured and give us the opportunity to make modifications to our implementation to attempt to address this issue. Similarly, we shall use gradientCheck method in PyBrain to verify the results of our ANNs algorithms by determining whether the numerical gradients are  equal (accounting for a reasonable margin of error) to the gradient given by the \_backwardImplementation() methods for said implementation in PyBrain. Both of these methods will give us an easy to understand and compare metric for determining the validity of our results. We shall also use the Pandas library to graph our features onto a 2d plane and visualize the classification process. Due to the sheer number of features in our data set, these visualizations will be of limited use for verifying the results of our algorithms, but may be of use as a pedagogical tool in communicating the experimental results of our study to a the reader. 
+\section{Results}
+After generating the BROWN 60 altered corpus, we attempted to classify the results with the NBc algorithm. NBc yielded an accuracy score of 0.518\%. After regenerating the BROWN 60 corpus, the result from NBc rose to 0.813\%. This wild fluctuation in accuracy is a signal that our implementation of the either corrupt.py or classify.py requires correction.
+\section{Conclusion}
+Without having finalized the implementation of the Elman ANN and having experienced such irregular results from our NBc, it is impossible to draw any conclusions about the accuracy of either algorithm at the identification of verb tense errors in natural language at this point in the project.
+
+\bibliographystyle{plain}
+\bibliography{references}
+\end{document}

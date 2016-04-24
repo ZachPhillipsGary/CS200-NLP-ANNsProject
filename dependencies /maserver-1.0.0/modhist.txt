@@ -1,0 +1,22 @@
+Version 1.0.0.  September 25, 2013.
+
+    No changes to MAServer.  Update to use MorphAdorner v2.0.1 .
+
+Version 1.0.0.  September 17, 2013.
+
+    Allow standard spelling to be emitted as choice structure when
+    adorning TEI files.
+
+Version 0.9.8.  September 11, 2013.
+
+    Allow access to both US and UK rules in hyphenator.
+
+Version 0.9.7.  August 25, 2013.
+
+    Corrected character encoding (accented characters) in TestLanguageRecognizerService.
+
+Version 0.9.7.  August 20, 2013.
+
+    Initial pre-release.
+
+

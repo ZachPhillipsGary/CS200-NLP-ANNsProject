@@ -1,0 +1,102 @@
+<html>
+
+<head>
+<meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
+<title>Test Text Summarizer service</title>
+<link rel="stylesheet"
+      href="maserver.css"
+      type="text/css" media="screen" />
+<style type="text/css" media="all">
+   <!--
+   @import "maserver.css";
+   //-->
+</style>
+</head>
+
+<body>
+
+<h1>Test Text Summarizer service using GET</h1>
+
+<p>
+Enter text to summarize in the text field below.
+</p>
+
+<form accept-charset="UTF-8" method="get" action="summarizer"
+      target="_blank"
+      name="summarizer">
+<table cellpadding="0" cellspacing="5">
+
+<tr>
+<td><strong>Text:</strong></td>
+<td colspan="2">
+<textarea name="text" rows="15" cols="76"></textarea>
+</td>
+</tr>
+
+<tr>
+<td>&nbsp;</td>
+<td>
+<input type="checkbox" name="includeInputText" value="true"
+       checked="checked"/>
+Include input text in results
+</td>
+</tr>
+<tr>
+<td valign="top">
+<strong>
+Lexicon:</strong>
+</td>
+<td>
+<input type="radio" name="corpusConfig" value="eme">Early Modern English</input><br />
+<input type="radio" name="corpusConfig" value="ece">Eighteen Century English</input><br />
+<input type="radio" name="corpusConfig" value="ncf" checked="checked">Nineteenth Century Fiction</input>
+</td>
+</tr>
+<tr>
+<td><strong>Summary sentences:</strong></td>
+<td>
+<input type="text" name="maxSumSent" size = "20" value="5" />
+</td>
+</tr>
+<tr>
+<td>
+&nbsp;
+</td>
+<td>
+&nbsp;
+</td>
+</tr>
+<tr>
+<td valign="top">
+<strong>Results format:</strong>
+</td>
+<td>
+<input type="radio" name="media" value="json">JSON format</input><br />
+<input type="radio" name="media" value="xml" checked="checked">XML format</input><br />
+<input type="radio" name="media" value="html">HTML format</input><br />
+<input type="radio" name="media" value="text">Text format</input>
+</td>
+</tr>
+<tr>
+<td>
+&nbsp;
+</td>
+<td>
+&nbsp;
+</td>
+</tr>
+
+<tr>
+<td colspan="2">
+<input type="submit" name="summarizer" value="Summarizer" />
+</td>
+</tr>
+
+</table>
+</form>
+
+</body>
+
+</html>
+
+
