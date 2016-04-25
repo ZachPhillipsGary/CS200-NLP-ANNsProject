@@ -82,7 +82,7 @@ post:
 ClassificationDataSet filled with CFGs created from file by NPChunker
 """
 def preProcess(file, type):
-	ds.appendLinked([float(converttoCFG(file))], [type])
+	ds.appendLinked([nltk.toVector(converttoCFG(file))], [type])
 
 
 #train the network on valid data
@@ -110,12 +110,24 @@ outLayer = LinearLayer(1)
 n.addInputModule(inLayer)
 n.addModule(hiddenLayer)
 n.addOutputModule(outLayer)
-#connect layers
+#connect layers together
 in_to_hidden = FullConnection(inLayer, hiddenLayer)
 hidden_to_out = FullConnection(hiddenLayer, outLayer)
 #add layers to network
 n.addConnection(in_to_hidden)
 n.addConnection(hidden_to_out)
 n.sortModules()
-
-			
+tstdata, trndata = ds.splitWithProportion( 0.25 )
+fnn = buildNetwork( trndata.indim, 5, trndata.outdim, outclass=SoftmaxLayer )
+#ready the trainer
+trainer = BackpropTrainer( fnn, dataset=trndata, momentum=0.1, verbose=True, weightdecay=0.01)
+#Start the training iterations.
+for i in range(20):
+	 trainer.trainEpochs( 1 )
+#get results
+trnresult = percentError( trainer.testOnClassData(),                              trndata['class'] )
+tstresult = percentError( trainer.testOnClassData(dataset=tstdata ), tstdata['class'] )
+print "epoch: %4d" % trainer.totalepochs, \
+	"  train error: %5.2f%%" % trnresult, \
+	"  test error: %5.2f%%" % tstresult
+#TODO: add plot
