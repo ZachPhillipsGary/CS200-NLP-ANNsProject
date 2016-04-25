@@ -21,7 +21,7 @@ from scipy 					     import diag, arange, meshgrid, where
 from numpy.random 				 import multivariate_normal
 #End includes
 """
-First, we need to indentify chuck patterns 
+First, we need to identify chuck patterns 
 Thus, we need a system to learn tag patterns (regular expressions to find sentences based on tags).
 Since this isn't the focus of this project, a preexisting solution will be used. The solution in question uses NLTK's
 builtin 
@@ -83,7 +83,7 @@ ClassificationDataSet filled with CFGs created from file by NPChunker
 """
 def preProcess(file, type):
 	ds.appendLinked([str(converttoCFG(file))], [type])
-
+##TODO: better 
 
 #train the network on valid data
 #preProcess('word.txt','Correct')
@@ -117,5 +117,7 @@ hidden_to_out = FullConnection(hiddenLayer, outLayer)
 n.addConnection(in_to_hidden)
 n.addConnection(hidden_to_out)
 n.sortModules()
+#start training iterations 
+for i in range(20):
 
 			
