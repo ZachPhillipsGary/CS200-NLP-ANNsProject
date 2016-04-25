@@ -82,7 +82,7 @@ post:
 ClassificationDataSet filled with CFGs created from file by NPChunker
 """
 def preProcess(file, type):
-	ds.appendLinked([str(converttoCFG(file))], [type])
+	ds.appendLinked([float(converttoCFG(file))], [type])
 
 
 #train the network on valid data
