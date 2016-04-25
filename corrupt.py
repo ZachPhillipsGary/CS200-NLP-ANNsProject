@@ -3,19 +3,33 @@ import os
 import nltk #for general NLP and classifiers
 # import pybrain for ANNs
 import random #for selection of verbs to alter
-import en #conjugator service
+#import en #conjugator service
 import urllib2  #for HTTP requests
 import xml.etree.ElementTree as ET #for xml parsing
 from nltk.corpus import brown
 #start up MorphAdorner   
-#os.system("cd dependencies\ /maserver-1.0.0/; ./runmaserver")
-#^Doesn't work
-print "Please run cd dependencies\ /maserver-1.0.0/; ./runmaserver before calling this script" 
+print "Please run cd dependencies/maserver-1.0.0/; ./runmaserver before calling this script" 
 """ 
 ---preprocesssing phase---
 Introduce errors into each file in the brown corpus and save our modified versions inside a new directory
 
 """
+def is_noun(tag):
+    return tag in ['NN', 'NNS', 'NNP', 'NNPS']
+
+
+def is_verb(tag):
+    return tag in ['VB', 'VBD', 'VBG', 'VBN', 'VBP', 'VBZ']
+
+
+def is_adverb(tag):
+    return tag in ['RB', 'RBR', 'RBS']
+
+
+def is_adjective(tag):
+    return tag in ['JJ', 'JJR', 'JJS']
+
+
 
 """
 NOT USED :(
@@ -91,10 +105,10 @@ def modifyVerb(v):
   	 	#finished loading verb data (if needed), now modify the damn thing
   	 	possibleTenses = ["firstPersonSingular","secondPersonSingular","thirdPersonSingular","firstPersonPlural","secondPersonPlural","thirdPersonPlural"] 
   		newTense = random.choice(possibleTenses)
-  		conjugations = verbTable[str(verb[0])]
+  		conjugations = verbTable[str(verb[0])] #get conjugations from hashtable
   		verb[0] = conjugations[str(newTense)]
-  		print verb
-  		return tuple(verb)
+  		print verb 
+  		return tuple(verb) #return result as immutable tuple
 
 #get files in the brown corpus
 Brownfiles = nltk.corpus.brown.fileids()
@@ -106,11 +120,11 @@ for file in Brownfiles:
 	taggedFile = nltk.pos_tag(corpusFile)
 	#now find verbs
 	for word in taggedFile:
-		if word[1] == 'VB':
+		if is_verb(word[1]) == True:
 			getword = modifyVerb(word)
 		else:
 			getword = word
-		fileObject.write( str(getword[0]+"/"+getword[1]) )
+		fileObject.write( str(getword[0]+' ') )
 		pass
 	#write modifed version of corpus subset to file
 	fileObject.close()
