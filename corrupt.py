@@ -3,10 +3,11 @@ import os
 import nltk #for general NLP and classifiers
 # import pybrain for ANNs
 import random #for selection of verbs to alter
-#import en #conjugator service
+#import en #nodebox conjugator service (NOT USED)
 import urllib2  #for HTTP requests
 import xml.etree.ElementTree as ET #for xml parsing
 from nltk.corpus import brown
+from random import randint #for random number generator
 #start up MorphAdorner   
 print "Please run cd dependencies/maserver-1.0.0/; ./runmaserver before calling this script" 
 """ 
@@ -41,10 +42,10 @@ or [u'find', 'VB'])
 @param(tuple) tagged verb to be altered ('verb','VB')
 pre: n/a
 post: returns inputted verb
-
+"""
 def NodeboxmodifyVerb(v):
-	verbObject = list(v) #convert into list for processing
-	##because the tagger isn't pefect (~90% accuracy) we need make sure we got verb
+	verbObject = list(v) #convert into list so we can modify it
+	##double check that we got a verb
 	if verbObject[1] == 'VB':
 		currentTense = en.verb.tense(verbObject[0]) #get current tense of verb
 		newTense = random.choice(en.verb.tenses())
@@ -78,15 +79,16 @@ def NodeboxmodifyVerb(v):
 """
 
 #create a dictionary for fast verb lookups 
+
+"""
 verbTable = {}
 
 """
-modifyVerb()
+modifyVerb() -- replaces verb with same verb in a random tense 
 
 @param(tuple) tagged verb to be altered ('verb','VB')
 pre: n/a
 post: returns inputted verb as tuple
-
 """
 def modifyVerb(v):
 	verb =  list(v) #convert tuple into list so we make changes to it
@@ -109,24 +111,37 @@ def modifyVerb(v):
   		verb[0] = conjugations[str(newTense)]
   		print verb 
   		return tuple(verb) #return result as immutable tuple
+"""
+randomly_alter_verbs(persentage) -- iterates through the brown corpus and changes the tense of a particular persentage indicated in by the function param
 
-#get files in the brown corpus
-Brownfiles = nltk.corpus.brown.fileids()
-for file in Brownfiles:
-	#create a new file with the format
-	corpusFile = nltk.corpus.brown.words(file)
-	fileObject = open(str(file)+"modified", "w")
-	#get tags
-	taggedFile = nltk.pos_tag(corpusFile)
-	#now find verbs
-	for word in taggedFile:
-		if is_verb(word[1]) == True:
-			getword = modifyVerb(word)
-		else:
-			getword = word
-		fileObject.write( str(getword[0]+' ') )
+@param(Number) persentage of verbs to modifed
+pre: NLTK imported, MorphAdorner running locally on port 8182
+post: persentage% of verbs modified, modified brown corpus copied to current directory
+"""
+def randomly_alter_verbs(persentage) 
+	#get files in the brown corpus
+	Brownfiles = nltk.corpus.brown.fileids()
+	for file in Brownfiles:
+		#create a new file with the format
+		corpusFile = nltk.corpus.brown.words(file)
+		fileObject = open(str(file)+"modified", "w")
+		#get tags
+		taggedFile = nltk.pos_tag(corpusFile)
+		#now find verbs
+		for word in taggedFile:
+			if is_verb(word[1]) == True:
+				#determine if we should modify this verb
+				if randint(1,10) < persentage:
+					getword = modifyVerb(word)
+				else:
+					getword = word #don't modify
+			else:
+				getword = word
+			fileObject.write( str(getword[0]+' ') )
+			pass
+		#write modifed version of corpus subset to file
+		fileObject.close()
+		print 'modified verbs in '+str(file)
 		pass
-	#write modifed version of corpus subset to file
-	fileObject.close()
-	print 'modified verbs in '+str(file)
-	pass
+persentageToModify = input('Enter persentage of verbs to modify: ');
+randomly_alter_verbs(persentageToModify);

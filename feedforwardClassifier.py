@@ -26,19 +26,19 @@ Thus, we need a system to learn tag patterns (regular expressions to find senten
 Since this isn't the focus of this project, a preexisting solution will be used. The solution in question uses NLTK's
 builtin 
 """
-#Beginning code from https://www.eecis.udel.edu/~trnka/CISC889-11S/ Chuck parser lecture notes
+#Based on code from https://www.eecis.udel.edu/~trnka/CISC889-11S/ Chuck parser lecture notes
 
 class ChunkParser(nltk.ChunkParserI):
 	 def __init__(self, train):
-		train_data = [[(t,c) for w,t,c in nltk.chunk.tree2conlltags(sent)] for sent in train]
-	 	self.tagger = nltk.TrigramTagger(train_data)
-
+		train_data = [[(t,c) for w,t,c in nltk.chunk.tree2conlltags(sent)] for sent in train] #get training data
+	 	self.tagger = nltk.TrigramTagger(train_data) ##apply tagger (chooses a token's tag based its word string and on the preceeding two words' tags)
+	 	#see http://nltk.sourceforge.net/doc/api/nltk.tag.sequential.TrigramTagger-class.html
 	 def parse(self, sentence):
 		pos_tags = [pos for (word,pos) in sentence]
 		tagged_pos_tags = self.tagger.tag(pos_tags)
 		chunktags = [chunktag for (pos, chunktag) in tagged_pos_tags]
 		conlltags = [(word, pos, chunktag) for ((word,pos),chunktag) in zip(sentence, chunktags)] 
-		return nltk.chunk.conlltags2tree(conlltags)
+		return nltk.chunk.conlltags2tree(conlltags) #find and return non-overlapping groups
 
 
 #create training and testing sets for the chunker 
@@ -48,7 +48,6 @@ train_sents = conll2000.chunked_sents('train.txt', chunk_types=['NP'])
 NPChunker = ChunkParser(train_sents)
 #echo out results
 print NPChunker.evaluate(test_sents)
-#End of code from https://www.eecis.udel.edu/~trnka/CISC889-11S/
 inputdim = 1
 #Create ClassificationDataSet
 ds = ClassificationDataSet(inputdim, nb_classes=2, class_labels=['Correct','Incorrect'])
@@ -82,7 +81,8 @@ post:
 ClassificationDataSet filled with CFGs created from file by NPChunker
 """
 def preProcess(file, type):
-	ds.appendLinked([str(converttoCFG(file))], [type])
+	print str(converttoCFG(file))
+	#ds.appendLinked([str(converttoCFG(file))], [type])
 
 
 #train the network on valid data
@@ -101,6 +101,7 @@ for corpus in brownCorpora:
 	#append "modified" to the corpus file names to get edited versions
 	preProcess(corpus+"modified",'Correct')
 	pass
+	"""
 #Create the ANN
 n = FeedForwardNetwork()
 #Add layers
@@ -110,12 +111,27 @@ outLayer = LinearLayer(1)
 n.addInputModule(inLayer)
 n.addModule(hiddenLayer)
 n.addOutputModule(outLayer)
-#connect layers
+#connect layers together
 in_to_hidden = FullConnection(inLayer, hiddenLayer)
 hidden_to_out = FullConnection(hiddenLayer, outLayer)
 #add layers to network
 n.addConnection(in_to_hidden)
 n.addConnection(hidden_to_out)
 n.sortModules()
+tstdata, trndata = ds.splitWithProportion( 0.25 )
+fnn = buildNetwork( trndata.indim, 5, trndata.outdim, outclass=SoftmaxLayer )
+#ready the trainer
+trainer = BackpropTrainer( fnn, dataset=trndata, momentum=0.1, verbose=True, weightdecay=0.01)
+#Start the training iterations.
+for i in range(20):
+	 trainer.trainEpochs( 1 )
+#get results
+trnresult = percentError( trainer.testOnClassData(),                              trndata['class'] )
+tstresult = percentError( trainer.testOnClassData(dataset=tstdata ), tstdata['class'] )
+print "epoch: %4d" % trainer.totalepochs, \
+	"  train error: %5.2f%%" % trnresult, \
+	"  test error: %5.2f%%" % tstresult
+#TODO: add plot
+"""
 
-			
+
