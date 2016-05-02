@@ -2,7 +2,7 @@
 
 
 ##How to run application (OSX and Mac only)
-
+This application uses a virtualenv isolated python environment. Thus, everything you need to run the application should already be bundled with it. To install the application, simply run "git clone https://github.com/ZachPhillipsGary/CS200-NLP-ANNsProject.git" at your command prompt.
 ###Preprocessing Stage
 1. Open a command prompt and cd into this directory (CS_JIS_Project)
 2. Cd into dependencies -> maserver-1.0.0 and run ./runmaserver
