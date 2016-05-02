@@ -1,0 +1,181 @@
+
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{listings}
+
+\title{Verb Tense Error Detection with Artificial Neural Networks}
+\author{Zach Phillips-Gary}
+\date{March 2016}
+\usepackage{setspace}
+%\singlespacing
+\doublespacing
+\usepackage{natbib}
+\usepackage{graphicx}
+\usepackage[]{algorithm2e}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+A significant amount of time and energy has been devoted to developing software to identify and correct grammatical errors in natural language texts. Contemporary efforts in this sphere of research have focused on utilizing machine learning algorithms to classify sentences as either grammatically correct or incorrect and then to dynamically rectify the errors within the subset of incorrect sentences.  In this paper, we examine the performance of two classes of machine learning algorithms (Artificial Neural Networks (ANNs)) and Naïve Bayes classifiers (NBc) in determining whether a given sentence in a body of English text contains a verb tense disagreement error. Formally stated, a sentence in the English language contains a verb-tense disagreement error if the tense of the verb lacks agreement with the tense of the subject. For example, the phrase “The cow jumping over the fence” clearly contains an instance of this class of grammatical error, yet major contemporary word-processing tools fail to recognize the sentence as incorrect. For our analysis, we  treat the verb tense disagreement error as an extension of the general binary classification problem in machine learning. Our primary goal with this project will be provide the reader with an account of on a particular subset of the grammar inference problem (verb tense error detection) and explain how recurrent artificial neural networks and Naïve Bayes classifiers can be applied to this problem. To this end, we will implement a series of Python scripts to alter and tag a corpus of English text for use as a training set when building ANNs to solve this class of problem. In addition, we shall provide an overview of key natural language processing tasks related to this problem and briefly summarize how the NLTK library \citep{NLTK} uses machine learning techniques to complete these tasks. 
+
+\section{Natural Language Processing and Machine Learning}
+Natural language processing (NLP) is a subfield of computer science and artificial intelligence that seeks to utilize computers to derive information from natural language. Modern techniques in NLP often use statistical machine learning methods to infer information about a corpus or corpora of text. Our project is a classic example of an automated proof reading problem in the field of NLP. However, in solving this problem we also utilize several other major areas of study in the NLP domain. For example, our application will depend heavily upon algorithms that perform part-of-speech (POS) tagging to be able to identify verbs in a sentence and determine if said verb is in the proper tense for the sentence in question. 
+Although not the focus of this project, the tagging algorithms we utilize rely heavily upon machine learning techniques \citep{NLPML} to correctly parse and tag a string of natural language text. From these POS tagging algorithms, we will obtain a tagged version of our corpus. This "tagged" corpus will contain the original text, annotated with machine readable meta data will allow our software to "understand" what role each word plays in the sentence and thus infer whether the sentence in question is grammatically correct or not. POS tagging is a more complex and nuanced process than mere tokenization, because it takes into account subtle word usage and appropriately tags a word even when used in unorthodox contexts. For example, the phrase "The sailor dogs the hatch" utilizes the term "dog" as a verb and not a noun. Simple regular expression based tokenization procedures fail to recognize this idiosyncratic usage of this elementary term. Because of the complexity of the POS tagging task and the myriad of well developed software tools available to solve this task, we shall utilize the NLTK (natural language tool kit) POS-tagger class to compute this information for us, leaving us to focus on the task of identifying verb tense errors in the tagged text. 
+
+\section{A Brief Introduction to Machine Learning}
+Machine learning algorithms have been in use since the late 1950s and are integral to numerous fields of Computer Science, including Computer Vision, Natural Language Processing, Robots, Computer Security and Bioinformatics. Despite its age, the Naïve Bayes classifier has been proven to remain a viable tool in NLP applications \citep{russell2003artificial} \citep{AnderewNG}, thus we utilize it in the subject-verb disagreement detection software. The Naïve Bayes classifier is a family of algorithms that solve the binary classification problem probabilistically by applying Bayes' law by making independence assumptions between the set features. We compare the performance of this machine learning algorithm with the Long short-term memory artificial neural network architecture as as implemented by Anthony Penniston in \citep{Ryerson}. Contrary to popular belief, artificial neural network algorithms are merely a class of machine learning algorithms that use neurological models as an inspiration for how to implement algorithms that can infer information about a data set. We provide a detailed account of each of these terms in the sections below.
+
+\subsection{Binary Classification Problem}
+The binary classification problem (BCP) is one of the most frequently studied in the field of machine learning. Binary classification has a myriad of applications in both machine learning and NLP. In its most simple form, the binary classification problem can be stated as follows: given a scattering $x$ in a domain $X$, estimate which value an associated random variable $y \in \{ \pm 1\}$ will assume \citep{Smola08introductionto}. Turning to the problem at hand, we  treat each sentence as an atomic entity, containing at most a single instance of the verb tense disagreement and at least zero instances of this class of grammatical error. Formally stated, our project  attempts to classify sentences as either containing verbs that are in the proper tense for the context of the sentence or containing verbs in an improper tense for the sentence in question. 
+Geometrically, we can think of binary classification as imposing a polynomial fit upon  a data set mapped to a two dimensional plane (as illustrated in figure 1). 
+\begin{center}
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.5]{mlplaceholder.jpg}
+\caption{Classification results from 60\% altered copy of the BROWN corpus with the Naive Bayes algorithm.}
+\label{fig:univerise}
+\end{figure}
+\end{center}
+In conclusion, binary classification is a simple yet frequently encountered problem in machine learning.  As describe in future sections, a wide array of machine learning algorithms exist to solve this class of problem. However, there is no single machine learning algorithm that is optimal for every class of machine learning problem (as demonstrated by David Wolpert in \textit{No Free Lunch Theorems for Optimization} \citep{ref1}). Hence, the optimal algorithm for a particular application can only be determined through a mixture of theory and experimental testing. 
+\subsection{Supervised learning}
+Some machine learning algorithms require the existence of a \underline{training set} in order classify raw data into a series of categories. This training set contains data that is similar to the type of raw data the algorithm is expected to categorize but in which each element has be pre-labeled with the appropriate category in which it ought to be placed. Both the control algorithm (NBc) and our ANNs use supervised learning, hence they must be provided with a set correctly labeled data to be able to infer any meaningful conclusions about the raw data. A corollary feature of supervised learning algorithms is that the quality of their predictions about a particular piece of data is as dependent upon the quality of their training set as it is upon quality of the implementation of the algorithm. As a result, supervised learning algorithms are often poorly suited to natural language processing error detection applications, as natural languages are subtle in nature and it often hard to obtain a training corpus of sufficient size to be useful.
+However, supervised learning algorithms proved to be a good fit for our project, due to the relative simplicity of introducing errors of the class we are attempting to detect into a corpus of text in comparison with other projects in the realm of natural language processing. 
+\subsection{Artificial Neural Networks Fundamentals}
+Artificial Neural Networks are a class of machine learning algorithm inspired by neural cells in mammalian brains. At its core, neurons are simple a many-inputs to one output unit, much like a flip-flop circuit. In an ANN, we restrict the possible input/output values to a binary set of values (i.e: -1,1). 
+Neurons continuously evaluate their output by looking at their inputs, calculating the weighted sum of the inputs by comparing it to a threshold to determine if the neurons should fire or not. Alone, a single neuron is nothing more than a series of conditionals. The power of neurons, both in \textit{in silico} and \textit{in vivo} comes from placing them into an interconnected network with other neurons, this "neural network" has unique evolutionary properties which both traditional algorithms and solo neurons lack. Eventually, a neural network will reach a point in which all neurons continue to evaluate their inputs but in which no further changes in their state occur. This state of stability is dependent on both the value of the inputs into the network, the weights on said inputs, and the neuron thresholds. 
+\subsubsection{Recurrent vs Feed-forward Artificial Neural Networks}
+\underline{Feed-forward ANNs} are one of the simpler ANN architectures. An artificial neural network is a said to be feed-forward when the output from one layer of neurons feeds forward into the next layer of neurons. There are no backward connections, and connections do not bypass any layers to connect to another. Typically, the layers in a feed-forward ANN are fully connected, meaning that all of the units at one layer are connected with all units at the next layer in the network. In contrast, the connections between neurons \underline{recurrent neural network}  form a directed cycle. Recurrent neural networks typically are more powerful than feed-forward neural networks since they have the ability to use their internal memory to process arbitrary sets of information. However, feed-forward neural networks are simpler to implement and can compute solutions faster than their more advanced counterparts. We will be testing both types of ANNs to determine whether the increased complexity of a recurrent neural network results in increased accuracy in our results.  Contemporary research suggests that only the Elman network architecture \citep{Smith_grammarinference} offers notable gains in accuracy over the more basic Naive Bayes classifier algorithm.
+\subsubsection{Elman ANN architecture}
+Elman networks consist of a series of three layers. Elman networks are distinguished from ordinary multilayer recurrent ANNs by the addition of a series of connections between the middle layer (often refereed to as the "hidden" layer in machine learning literature \citep{neuralnets}) and a set of context units fixed with a weight of one. At each time-instance $t$, the input is propagated through the network in the same manner as in a feed-forward ANN. However, a series of fixed back connections result in the context neurons retaining a copy of the previous values of the hidden units. Thus, the network has a basic form of persistence of information between time-steps \citep{Smola08introductionto}, allowing it to perform tasks that are beyond the power of a standard multilayer ANN.  
+\subsection{Naive Bayes}
+The Naive Bayes classification algorithm is based upon a conditional probability model. Software implementations of NBc convert the features to be classified into a vector of feature values. The algorithm assigns this feature vector a set of probabilities for each possible outcome. For our purposes, let us assume that x denotes the actual text of corpora being tested for grammatical errors and y is equivalent to the test for said errors. By Bayes rule, we can infer:
+$$ p(y|x)=\frac{p(x|y)p(y)}{p(x)}$$  Now assume that we have a reasonable estimate of the likelihood of given sentence in our corpus containing a grammar error of the class for which we are filtering. Since we are generating this data ourselves, we will know exactly how many incorrect sentences are in our text. However, in the real world we can only estimate this figure. Hence, we estimate that $p(correct) 	\approx \frac{m_{correct}}{m}$ (where $m_{correct}$ is the number of grammatically correct sentences in our corpus. Accordingly, we also assume that the value of $p(incorrect)$ is approximately equal to $\frac{m_{incorrect}}{m}$. Since we do not know the value of $p(x|y) or p(x)$, we must disregard the requirement that we know the value of $p(x)$ and must instead settle for a likelihood ratio \citep{Smola08introductionto}. Hence, we let $L(x) = \frac{p(correct|x)p(incorrect)}{p(x|incorrect)p(correct)}$, and when the value $L(x)$ falls outside of a particular  threshold $c$, the sentence in question is said to be grammatically incorrect. When $c$ becomes very large, fewer sentences will be classified as grammatically incorrect. But when $c$ is too small, our algorithm will admit an unacceptable number of false positives. Neither of these outcomes is attractive, but we have few options since we do not know $p(x|y)$. In order to rectify this state of affairs, we assume that each test case is conditionally independent \citep{Smola08introductionto} and treat each sentence in the corpus (our atomic unit) as a  separate and discrete test. We then combine the outcomes  of these in a "naive fashion" by assuming that \citep{Smola08introductionto} $p(x|y) = (\prod^{$sentences in corpus x$}_{j=1} p(w^j|y)$ where $w^j$ denotes the j$^{th}$ sentence in a given corpus.
+
+Essentially, this statement is equivalent to the assumption that the probability of the occurrence of a single grammatical error of the class in question in a sentence within the corpus has no relationship with the probability of the occurrence of a grammatical error in another sentence within the corpus. This assumption is unproblematic for our application, as it is very possible for a body of text to contain a grammar error in only one of the sentences. Besides ensuring that the presence or lack of grammar errors in one sentence will not prejudice our algorithm towards the corpus at large, this assumption also simplifies the issue of knowing p(x|y) to that of estimating the probabilities of the occurrence of a grammar error in a particular sentence $w$. We can use the build-in functionality of our natural language processing library to compute the number of verbs within a given corpus and from that information, determine the probability of a given sentence containing an error of the class we are attempting to demarcate. Thus, we can arrive at a reasonable estimate of  probabilities of a given sentence containing a grammatical error in a single iteration through our corpus. 
+
+\subsection{Tokenization, Parts of Speech Tagging and Chunking}
+Classifying words within a sentence based upon their role in the sentence is an essential task in many NLP applications. A Part-Of-Speech Tagger (POS Tagger)" is a piece of software that reads text in some language and assigns parts of speech to each word (and other token), such as noun, verb, adjective, etc."  \citep{Stanford} Since English is not a formal language (and is known for being notoriously nuanced in it structure and word usage, even among natural languages), POS tagging even in sophisticated software libraries is an imperfect process. Simple POS Taggers rely upon regular expressions to detect parts of speech and tag words accordingly; however, this method of tagging is effective only upon the most elementary of sentences. Modern POS tagging software like NLTK or the Stanford Parser \citep{Stanford} leverage Bayesian machine learning algorithms  \citep{NLTKAPI} to appropriately categorize natural language tokens. The NLTK library \citep{NLTK} includes wide array of tagging algorithms which tag bodies of natural language with machine readable annotations that conform to a wide array of metadata standards. No matter what the application (be it translation, tone analysis, or the focus of our paper grammatical error detection), nearly all complex NLP applications will either perform POS tagging or require that the input data be annotated with metadata before being loaded into the system. 
+
+However, before tagging can occur, a string of natural language text must first be tokenized. In NLP, tokenization is the process of converting a block of text into words, symbols, or other meaningful parts of speech. The lexically significantly entities which are isolated though the tokenization process are often called tokens. Tokens are the atomic element used by NLP when attempting to infer grammatical information about a phrase, paragraph or larger body of text. These grammars give NLP software applications the necessary cues to understand how words relate to each other within a particular sentence.
+\begin{center}
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.4]{tagandtoken.jpg}
+\caption{Construction of a parse tree from natural language string in NLTK }
+\label{fig:univerise}
+\end{figure}
+\end{center}
+ Despite the tremendous insights which can be algorithmically derived from a body of tagged natural language text, POS-tagging only provides an algorithm with lexical information about a single token. \underline{Chunking} provides an application with additional details about a given sentence by grouping natural language tokens by their tags. Some chunkers also construct context-free grammars (CFG) from these chunks. These CFGs are called parse trees. Parse trees are an annotated machine-readable representation of the syntactic structure of a natural language sentence.
+ The additional context provided by chunking a sentence allows a NLP application to \citep{NLTKCH7} understand the structure of a sentence and extract relevant information from it.
+\section{Methodology}
+
+Having provided an account of the theoretical underpinnings of our project and introduced the  key terms and concepts necessary to understand the common tasks in NLP projects, we can now report on some of the practical concerns associated with the development of NLP software and our own pre-processing system for creating data sets for training machine intelligence to detect subject-verb disagreement errors using supervised learning techniques. We will also describe our implementation of a Naive Bayes classifier algorithm for solving this very problem.
+\subsection{Corpora Selection}
+One concern when developing an NLP application which leverages machine intelligence techniques is the problem of selecting an appropriate learning set. Writing in the English language can employ a wide array of tones and many specialized areas of writing employ domain-specific language or turn-of-phrase. Hence, the author of an NLP application must consider what sort of language they are attempting to processing when selecting corpora for training and testing purposes. In some industry applications, a developer can collect real user data for use in training their application. 
+
+However, this process is only feasible if the large set of data exemplifying both the problem in question and solved instances of the problem exists. In practice, such sets are only available for trivial NLP problems (ex: correcting spelling) and are too time-consuming to compile by hand. Hence, some sort of error-generation script \citep{Ryerson} is required for the generation of a clean yet board training set for the development of NLP  applications.
+
+In conclusion, corpora selection is an essential aspect of any NLP project that leverages machine learning algorithms to make decisions about natural language strings. Many applications that involve the detection of grammatical will require the implementation of a piece of software to format and generate a training corpus. Our implementation of such a program will be discussed in greater detail in later in this paper.
+
+\subsection{Application Workflow}
+As eluded to in our introduction, our application consists of two parts: a preprocessing script that generates a training set containing a particular percentage of sentences with subject-verb disagreement errors (corrupt.py) and a Naive Bayes classifier which detects whether a sentence contains subject-verb disagreement errors (classify.py). Both corrupt corrupt.py and classify.py are powered by the NLTK \citep{NLTK} library.  
+\begin{center}
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.5]{appframework.png}
+\caption{Application workflow}
+\label{fig:univerise}
+\end{figure}
+\end{center}
+
+\subsection{Corpora preprocessing}
+A major challenge in this project was obtaining a corpus which contained relevant metadata to our project. Thankfully, the NLTK (Natural language tool kit) library comes bundled with a series of tools for encoding natural language text with machine readable tags which allows us to skip the complex task of tokenizing strings of raw text and tagging each word with its grammatical role in the sentence (past-tense verb, noun, adverb, etc). We shall be using a version of the BROWN corpus which has been tagged with using the TEI metadata standard \citep{TEI}, a widely used format within in the NLP community. The BROWN corpus contains 500 samples of English-language text, totaling roughly one million words. \citep{Brown}
+\begin{center}
+\begin{figure}[h!]
+\centering
+\includegraphics[scale=0.5]{classify-py.jpg}
+\caption{Natural language tagging and preprocessing workflow in corrupt.py}
+\label{fig:univerise}
+\end{figure}
+\end{center}
+
+
+Because the BROWN corpus contains only samples of grammatically correct English, we must computationally introduce a series of grammatical errors of the class we wish to study into the corpus. Thus, we have devised a simple "corrupter" script which introduces verb tense errors into a copy of the BROWN corpus and tags them accordingly. The script (henceforth referred to as "corrupt.py")
+iterates through the corpus and randomly selects verbs to alter the tense of. To ensure rigorous experimental results, we shall create several different copies of the BROWN dataset, each with a different ratio of sentences with correct verb tense usage to invalid verb tense usage. 
+    
+
+At the core of the corrupt.py script is the randomly\_alter\_verb() procedure. This function  replaces a particular percentage of the verbs within the corpus with instances of the verb in a different tense. We use the MorphAdorner verb conjugation service \citep{MorphAdorner} to obtain  an alternative conjugate of the verb in question. The results from each API call are stored in a Python dictionary (hash table) so other conjugates can be obtained without an HTTP request in the future. 
+\begin{center}
+\begin{algorithm}[H]
+ \KwData{TEI encoded corpus}
+ \KwResult{N\% of verbs within the given corpus have a different tense}
+ \While {}{
+  \eIf{}{
+  \eIf{verb in dictionary}{
+    replace with random alternative tense from the dictionary\;
+    }{
+    make HTTP request to get verb conjugates\newline
+    place conjugates in dictionary
+     replace with random alternative tense from the dictionary\;
+    }
+   }{
+   tag verb with unedited flag\;
+  }
+  move to next word in corpus\;
+ }
+ \caption{randomly\_alter\_verbs() procedure pseudocode}
+ 
+ 
+\end{algorithm}
+
+\begin{lstlisting}
+\lstinputlisting[language=Python]{corrupt.py}
+if current word is a verb:
+    for each word in the corpus:
+
+\end{lstlisting}
+\end{center}
+\subsection{Classification Software}
+Having described the modification scheme utilized to create the training set and testing data, we now turn our attention to the classification software itself. As with corrupt.py, the classifier depends on NLTK library to tokenize and interpret the TEI metadata and the corpora itself. Python is a common language for implementing artificial neural networks for NLP applications. The PyBrain library and the Naive Bayes classifier that comes bundled with the NLTK library both have been optimized to account for the inherent performances issues in Python. 
+
+NLTK is used in a myriad of professional and academic applications and was created by a team of developers with years of experience in the field of NLP, thus it shall serve as an ideal baseline to compare new implementations against. Since NLTK does not come with any ANNs, developers must use PyBrain, Tensorflow, scikit-learn or one of the many other python machine learning for their ANN implementation. All of the frameworks specified above are well documented and have been optimized to compute results from large data-sets with relative speed and without error. Both PyBrain and NLTK utilize the NumPy library to quickly and efficiently perform computations upon matrices, a key mathematical operation in both the  NBc and ANN classification algorithms and in machine learning at large. 
+
+As illustrated in figures 3 and 4, the training corpora are preprocessed by corrupt.py in order to introduce grammatical errors into the dataset. The dataset is then split into two subsets, one of which is utilized as a training set and the other of which as a metric for testing the accuracy of the algorithm. The demarcation of the testing set from the training set be performed pseudo-randomly for each corpora tested. Because of the nature of the English language and the content of the BROWN corpus, it is almost guaranteed that a nontrivial number of sentences from the training set are present in the validation/testing set. However, this behavior is expected to occur within any non-curated dataset the application might be called upon to categorize and hence is unproblematic.  Once a specified percentage of the data has been randomly altered by corrupt.py, the corpus is then divided into the training set and testing set by the machine learning algorithm framework being used by the application.
+NLTK and many other frameworks which include machine intelligence include utilities for both creating datasets and verifying the efficiency of the training process.
+
+
+\subsection{Experimental measurement}
+For our NBc, we verified the experimental results with the nltk.classify.accuracy method. This method allowed us to compare the training set with the testing set and to receive the percentage result. This tool allowed us to detect when over-fitting occurred and gave us the opportunity to make modifications to our implementation to attempt to address this issue. Similarly, we used the nltk.parse.evaluate method for verifying that our chunker had been effectively trained. These methods utilize three metrics for determining whether the effectiveness of a training regime: Recall, Precision and IOB Accuracy. In NLTK, accuracy and precision are defined by the following equations \citep{NLTKCH7}: 
+$$accuracy = \frac{(tp + tn)}{(tp + tn + fp + fn)}$$
+
+$$precision =  \frac{tp}{tp} + fp$$
+
+Where $tp$ denotes the number of true positives, $tn$ designates the number of true negative. $fp$ indicates the number of false positives and $fn$ is equal to the number of true negatives. \underline{Recall} is the measurement percentage of correct matches in a class of tokens in proportion to the total number of elements in the token class.   The IOB Accuracy measure is simply the accuracy of the chunker at correctly assigning a determining the bounds of a chunk \citep{NLTKCH7}. For the Naive Bayes classifier, our only metric for effectiveness was the accuracy metric as defined above. More complex measurements of effectiveness are difficult to compare across different projects because of differences in dataset structure.
+
+\section{Results}
+\subsection{Chunker Training Results}
+Using the CoNLL 2000 Corpus from the NLTK corpora library, we were able to obtain the following results:
+\begin{lstlisting}
+   IOB Accuracy:  93.3%
+    Precision:     82.5%
+    Recall:        86.8%
+\end{lstlisting}
+
+\subsection{NBc Training Results}
+Using the BROWN Corpus and corrupt.py, we were able to obtain the following results from the NLTK's built in Naive Bayes classifier:
+\begin{lstlisting}
+    Accuracy:  67.8%
+\end{lstlisting}
+\section{Conclusion}
+Both the chunker and our Naive Bayes classifier exhibited relatively good performance when applied to the CoNLL and Brown corpora, respectively. Although other authors have achieved better results with the Naive Bayes classifier \citep{Ryerson} \citep{Smith_grammarinference} on small sentences, our applications performance was roughly comparable on longer sentences. Since the average sentence length in the BROWN corpus is $20$, our application average was more negatively effected by the complexity of our corpus than other projects. A more detailed analysis of our own application might reveal comparable performance to other authors results on datasets with shorter sentences, but would require the implementation of a more complex preprocessor script or an expansion of NLTK's measurement suite, both of which are outside of the scope of this paper. 
+
+In summary, machine intelligence algorithms have numerous applications to the field of NLP. As we have shown, recurrent artificial neural networks offer comparable performance to Bayesian machine learning algorithms when classifying natural language chunks as grammatically correct or not. However, algorithmic performance is dependent on the proper selection of corpora and quality of the tagging and chucking procedures applied to the corpora prior to training. Like the English language itself, NLP is an imperfect medium. NLP practitioners in both industry and academic must pay close attention to selecting data and algorithms that are well aligned with the problem in order to obtain successful results.
+
+
+
+
+\bibliographystyle{plain}
+\bibliography{references}
+\end{document}
