@@ -108,7 +108,7 @@ def modifyVerb(v):
   	 	possibleTenses = ["firstPersonSingular","secondPersonSingular","thirdPersonSingular","firstPersonPlural","secondPersonPlural","thirdPersonPlural"] 
   		newTense = random.choice(possibleTenses)
   		conjugations = verbTable[str(verb[0])] #get conjugations from hashtable
-  		verb[0] = conjugations[str(newTense)]
+  		verb[0] = str(conjugations[str(newTense)])
   		#append modification flag to word
   		verb[1] = verb[1]+'+mod'
   		print verb 
@@ -133,13 +133,14 @@ def randomly_alter_verbs(persentage):
 		for word in taggedFile:
 			if is_verb(word[1]) == True:
 				#determine if we should modify this verb
-				if randint(1,10) < persentage:
+				if randint(1,10) <= persentage:
 					getword = modifyVerb(word)
 				else:
 					getword = word #don't modify
 			else:
 				getword = word
-			fileObject.write( str(getword[0]+'/'+getword[1] ) )
+			if type(getword) is tuple:
+				fileObject.write( str(getword[0])+'/'+str(getword[1] ) )
 			pass
 		#write modifed version of corpus subset to file
 		fileObject.close()
