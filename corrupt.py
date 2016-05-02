@@ -110,7 +110,7 @@ def modifyVerb(v):
   		conjugations = verbTable[str(verb[0])] #get conjugations from hashtable
   		verb[0] = conjugations[str(newTense)]
   		#append modification flag to word
-  		verb[1].append('+mod')
+  		verb[1] = verb[1]+'+mod'
   		print verb 
   		return tuple(verb) #return result as immutable tuple
 """
@@ -120,7 +120,7 @@ randomly_alter_verbs(persentage) -- iterates through the brown corpus and change
 pre: NLTK imported, MorphAdorner running locally on port 8182
 post: persentage% of verbs modified, modified brown corpus copied to current directory
 """
-def randomly_alter_verbs(persentage) 
+def randomly_alter_verbs(persentage):
 	#get files in the brown corpus
 	Brownfiles = nltk.corpus.brown.fileids()
 	for file in Brownfiles:

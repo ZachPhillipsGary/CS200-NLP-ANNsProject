@@ -33,25 +33,42 @@ train_sents = conll2000.chunked_sents('train.txt', chunk_types=['NP'])
 NPChunker = ChunkParser(train_sents)
 #echo out results
 print NPChunker.evaluate(test_sents)
+def process(sentence):
+	modified =  False
+	#first convert string into list of tuples (word, tag)
+	annotatedSentence = [nltk.tag.str2tuple(t) for t in sentence.split()] #from http://www.nltk.org/book/ch05.html
+	#find verbs
+	for word in annotatedSentence:
+		if word[1].startswith('VB', 0, len(word)):
+			if word[1].endswith('+mod'):
+					print word
+				#the verb or verbs in this sentence have been modified, flag it as incorrect
+					modified =  False
+			pass
+		pass
+		if modified == True:
+			return tuple([sentence,'incorrect'])
+		else:
+			return tuple([sentence,'correct'])
+	pass
 """
 Chunker trained, ready to parse BROWN corpus
 """
+corpus = [] #populate with sentence/class tuples using process
 print("Ready to load data!")
-folder = input('Enter path to modified corpus:');
+#folder = raw_input('Enter path to modified corpus:');
 #get files in the brown corpus
 Brownfiles = nltk.corpus.brown.fileids()
 for file in Brownfiles:
-	f = open(folder+file+"modified", 'r')
-		for line in f:
-  			process(line)
-		f.close()
+	f = open(file+"modified", 'r') #we want to read our modified copy of the BROWN corpus
+	for line in f:
+  			corpus.append(process(line))
+	f.close()
 	pass
 
-for i in training_data: 
-	if
-vocabulary = set(chain(*[word_tokenize(i[0].lower()) for i in training_data]))
+vocabulary = set(chain(*[word_tokenize(i[0].lower()) for i in corpus])) 
 
-feature_set = [({i:(i in word_tokenize(sentence.lower())) for i in vocabulary},tag) for sentence, tag in training_data]
+feature_set = [({i:(i in word_tokenize(sentence.lower())) for i in vocabulary},tag) for sentence, tag in corpus]
 
 classifier = nbc.train(feature_set)
 
@@ -60,6 +77,3 @@ featurized_test_sentence =  {i:(i in word_tokenize(test_sentence.lower())) for i
 
 print "test_sent:",test_sentence
 print "tag:",classifier.classify(featurized_test_sentence)
-
-
-NPChunker.parse(nltk.pos_tag(nltk.word_tokenize("And now for something completely different"))).draw()
