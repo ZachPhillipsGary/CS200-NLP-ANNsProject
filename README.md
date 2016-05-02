@@ -9,4 +9,8 @@ This application uses a virtualenv isolated python environment. Thus, everything
 3. In a new terminal, cd into the project directory and enter "bin/python corrupt.py" (this will take around 4 hours)
 
 ###Classification Stage
-1. In a terminal window, run bin/python classify.py
+1. In a terminal window, run bin/python classify.py for the Naive Bayes classifier
+The code for other classifiers at
+1. feedforwardClassifier.py
+2. LSTMClassifier.py
+^Neither of these classifiers work
