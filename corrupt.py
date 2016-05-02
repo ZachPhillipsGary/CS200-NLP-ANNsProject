@@ -109,6 +109,8 @@ def modifyVerb(v):
   		newTense = random.choice(possibleTenses)
   		conjugations = verbTable[str(verb[0])] #get conjugations from hashtable
   		verb[0] = conjugations[str(newTense)]
+  		#append modification flag to word
+  		verb[1].append('+mod')
   		print verb 
   		return tuple(verb) #return result as immutable tuple
 """
@@ -137,7 +139,7 @@ def randomly_alter_verbs(persentage)
 					getword = word #don't modify
 			else:
 				getword = word
-			fileObject.write( str(getword[0]+' ') )
+			fileObject.write( str(getword[0]+'/'+getword[1] ) )
 			pass
 		#write modifed version of corpus subset to file
 		fileObject.close()
