@@ -3,7 +3,7 @@ import os
 import nltk #for general NLP and classifiers
 # import pybrain for ANNs
 import random #for selection of verbs to alter
-#import en #nodebox conjugator service (NOT USED)
+import en #nodebox conjugator service 
 import urllib2  #for HTTP requests
 import xml.etree.ElementTree as ET #for xml parsing
 from nltk.corpus import brown
@@ -83,6 +83,22 @@ def NodeboxmodifyVerb(v):
 """
 verbTable = {}
 
+#get tense from word tag (see http://clu.uni.no/icame/manuals/ for more info)
+def getTense(tag):
+	if tag == 'VB':
+		return 'infinitive'
+	if tag == 'VBD':
+		return 'past'
+	if tag == 'VBG':
+		return 'present'
+	if tag == 'VBP':
+		return 'present'
+	if tag == 'VBZ':
+		return 'present'
+	else:
+		return "unknown" 
+
+
 """
 modifyVerb() -- replaces verb with same verb in a random tense 
 
@@ -95,7 +111,7 @@ def modifyVerb(v):
 	print verb
 	if verb[0] not in verbTable:
 		#load verb
-		tense = "present"
+		tense = getTense(verb[1])
 		baseURL = "http://localhost:8182/verbconjugator?infinitive="+verb[0]+"&verbTense="+tense+"&media=xml&conjugate=Conjugate"
 		print baseURL
 		queryResult = urllib2.urlopen(baseURL).read()
@@ -112,7 +128,10 @@ def modifyVerb(v):
   		#append modification flag to word
   		verb[1] = verb[1]+'+mod'
   		print verb 
-  		return tuple(verb) #return result as immutable tuple
+  		if v[0] == verb[1]:
+  			return v
+  		else:
+  			return tuple(verb) #return result as immutable tuple
 """
 randomly_alter_verbs(persentage) -- iterates through the brown corpus and changes the tense of a particular persentage indicated in by the function param
 
@@ -125,10 +144,10 @@ def randomly_alter_verbs(persentage):
 	Brownfiles = nltk.corpus.brown.fileids()
 	for file in Brownfiles:
 		#create a new file with the format
-		corpusFile = nltk.corpus.brown.words(file)
+		corpusFile = nltk.corpus.brown.tagged_words(file)
 		fileObject = open(str(file)+"modified", "w")
 		#get tags
-		taggedFile = nltk.pos_tag(corpusFile)
+		taggedFile = corpusFile
 		#now find verbs
 		for word in taggedFile:
 			if is_verb(word[1]) == True:
@@ -140,7 +159,7 @@ def randomly_alter_verbs(persentage):
 			else:
 				getword = word
 			if type(getword) is tuple:
-				fileObject.write( str(getword[0])+'/'+str(getword[1] ) )
+				fileObject.write( str(getword[0])+'/'+str(getword[1] + " " ) )
 			pass
 		#write modifed version of corpus subset to file
 		fileObject.close()
